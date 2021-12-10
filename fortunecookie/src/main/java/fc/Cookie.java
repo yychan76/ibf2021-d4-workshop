@@ -1,4 +1,4 @@
-package edu.ibf2021.d6;
+package fc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,15 @@ public class Cookie {
     }
 
     public int size() {
-        return this.cookies.size();
+        if (this.cookies != null) {
+            try {
+                return this.cookies.size();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        }
+        return 0;
     }
 
     public boolean hasNext() {

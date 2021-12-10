@@ -1,4 +1,4 @@
-package edu.ibf2021.d6;
+package fc;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -11,6 +11,7 @@ import java.net.Socket;
 public class Server {
     private int port;
     private String dataFile;
+
     public Server(int port, String dataFile) {
         this.port = port;
         this.dataFile = dataFile;
@@ -31,14 +32,14 @@ public class Server {
                 try (DataInputStream inputStream = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()))) {
 
                     String msg = "";
-                    while (!msg.trim().equals("close")) {
+                    while (!"close".equals(msg.trim())) {
                         msg = inputStream.readUTF();
                         System.out.println("Received: " + msg);
 
-                        if (msg.equals("get-cookie")) {
+                        if ("get-cookie".equals(msg)) {
                             System.out.println("Sending cookie to client...");
                             String msgToClient = "cookie-text " + cookie.get();
-                            System.out.println(msgToClient);
+                            System.out.println("└─: " + msgToClient);
                             out.writeUTF(msgToClient);
                             out.flush();
                         }
@@ -49,6 +50,7 @@ public class Server {
             }
         }
     }
+
     public static void main(String[] args) throws IOException {
         Server server = new Server(3000, "cookie_file.txt");
         server.start();

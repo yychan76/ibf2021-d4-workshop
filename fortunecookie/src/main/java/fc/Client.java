@@ -1,4 +1,4 @@
-package edu.ibf2021.d6;
+package fc;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -49,7 +49,7 @@ public class Client {
 
                 String msg = "";
                 String serverMsg = "";
-                while (!msg.trim().equals("close")) {
+                while (!"close".equals(msg.trim())) {
                     int retries = 0;
                     System.out.print("> ");
                     msg = reader.readLine();
@@ -65,7 +65,7 @@ public class Client {
                         // System.out.println("Server response: " + serverMsg);
                         if (serverMsg.startsWith(COOKIE_PREFIX)) {
                             String cookieText = serverMsg.substring(COOKIE_PREFIX.length());
-                            System.out.println(cookieText);
+                            System.out.println("╘═{*} " + cookieText);
                         }
                     }
                 }
