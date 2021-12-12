@@ -48,7 +48,11 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
-        Server server = new Server(3000, "cookie_file.txt");
-        server.start();
+        if (args.length >= 2) {
+            int port = Integer.parseInt(args[0]);
+            String dataFile = args[1];
+            Server server = new Server(port, dataFile);
+            server.start();
+        }
     }
 }
