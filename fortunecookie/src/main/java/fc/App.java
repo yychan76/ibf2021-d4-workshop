@@ -32,7 +32,8 @@ public class App {
                     module = args[0];
                     if (module.equals("fc.Client")) {
                         Client client = new Client(host, port);
-                        client.start();
+                        client.listenForResponse();
+                        client.sendCommands();
                     }
                     break;
                 default:
