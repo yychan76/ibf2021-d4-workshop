@@ -39,9 +39,14 @@ public class CookieClientHandler implements Runnable {
                 if (messageFromClient != null && "get-cookie".equals(messageFromClient.trim())) {
                     sendCookie();
                 }
+
+                if (messageFromClient != null && "close".equals(messageFromClient.trim())) {
+                    closeAll(this.socket, this.bufferedReader, this.bufferedWriter, null);
+                    break;
+                }
             } catch (IOException e) {
                 closeAll(this.socket, this.bufferedReader, this.bufferedWriter, e);
-                // break;
+                break;
             }
         }
     }
@@ -60,7 +65,9 @@ public class CookieClientHandler implements Runnable {
     }
 
     private void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter, Exception exception) {
-        exception.printStackTrace();
+        if (exception != null) {
+            exception.printStackTrace();
+        }
         System.out.println("Closing server client handler");
         try {
             if (bufferedReader != null) {

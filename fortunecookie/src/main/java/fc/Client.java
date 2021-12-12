@@ -15,6 +15,7 @@ public class Client {
     private final String COOKIE_PREFIX = "cookie-text ";
     private final String PROMPT = "> ";
     private final long CONNECT_RETRY_WAIT_MS = 1000;
+    private boolean isClosed = false;
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
@@ -47,7 +48,7 @@ public class Client {
         Scanner scanner = new Scanner(System.in);
         String command = "";
         try {
-            while (!"close".equals(command.trim()) && this.socket.isConnected()) {
+            while (!this.isClosed && this.socket.isConnected()) {
                 if (!"get-cookie".equals(command.trim())) {
                     // if user typed get-cookie command, wait to display the cookie text
                     System.out.print(PROMPT);
@@ -56,20 +57,22 @@ public class Client {
                 this.bufferedWriter.write(command);
                 this.bufferedWriter.newLine();
                 this.bufferedWriter.flush();
+                this.isClosed = "close".equals(command.trim());
             }
         } catch (IOException e) {
             closeAll(this.socket, this.bufferedReader, this.bufferedWriter, e);
         }
         scanner.close();
+        closeAll(this.socket, this.bufferedReader, this.bufferedWriter, null);
     }
 
     public void listenForResponse() {
         new Thread(() -> {
             String serverResponse;
-            while (this.socket.isConnected()) {
+            while (!this.isClosed && this.socket.isConnected()) {
                 try {
                     serverResponse = this.bufferedReader.readLine();
-                    if (serverResponse.startsWith(COOKIE_PREFIX)) {
+                    if (serverResponse != null && serverResponse.startsWith(COOKIE_PREFIX)) {
                         String cookieText = serverResponse.substring(COOKIE_PREFIX.length());
                         System.out.println("╘═{*} " + cookieText);
                         // show the prompt for the next command
@@ -77,13 +80,16 @@ public class Client {
                     }
                 } catch (IOException e) {
                     closeAll(this.socket, this.bufferedReader, this.bufferedWriter, e);
+                    break;
                 }
             }
         }).start();
     }
 
     private void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter, Exception exception) {
-        exception.printStackTrace();
+        if (exception != null) {
+            exception.printStackTrace();
+        }
         System.out.println("Closing client connection");
         try {
             if (bufferedReader != null) {
